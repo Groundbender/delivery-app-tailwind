@@ -1,10 +1,9 @@
-export const getAddress = async ({
-  latitude,
-  longitude,
-}: {
+interface ICoords {
   latitude: string;
   longitude: string;
-}) => {
+}
+
+export const getAddress = async ({ latitude, longitude }: ICoords) => {
   const res = await fetch(
     `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}`
   );

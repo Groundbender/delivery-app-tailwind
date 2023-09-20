@@ -4,6 +4,7 @@ import Button from "../../ui/Button";
 import { formatCurrency } from "../../utils/helpers";
 import { addItem, getCurrentQuantityById } from "../cart/cartSlice";
 import DeleteItem from "../cart/DeleteItem";
+import UpdateItemQuantity from "../cart/UpdateItemQuantity";
 
 const MenuItem: React.FC<{ pizza: IPizza }> = ({ pizza }) => {
   const { id, name, unitPrice, ingredients, soldOut, imageUrl } = pizza;
@@ -45,7 +46,15 @@ const MenuItem: React.FC<{ pizza: IPizza }> = ({ pizza }) => {
             </p>
           )}
 
-          {isInCart && <DeleteItem pizzaId={id} />}
+          <div className="flex items-center gap-3 sm:gap-8">
+            {isInCart && (
+              <UpdateItemQuantity
+                pizzaId={id}
+                currentPizzaQuantity={currentQuantity}
+              />
+            )}
+            {isInCart && <DeleteItem pizzaId={id} />}
+          </div>
 
           {!soldOut && !isInCart && (
             <Button onClick={handleAddToCart} type="small">

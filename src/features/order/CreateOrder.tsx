@@ -11,7 +11,10 @@ import { createOrder } from "../../services/apiRestaurant";
 import { ICart, IOrder } from "../../types";
 import Button from "../../ui/Button";
 import { useSelector } from "react-redux";
-import { RootState } from "../../store";
+import { RootState, store } from "../../store";
+import { clearCart, getCart, getTotalCartPrice } from "../cart/cartSlice";
+import EmptyCart from "../cart/EmptyCart";
+import { formatCurrency } from "../../utils/helpers";
 
 // https://uibakery.io/regex-library/phone-number
 const isValidPhone = (str: string) =>
@@ -47,12 +50,19 @@ type FormErrors = {
   phone?: string;
 };
 const CreateOrder = () => {
-  // const [withPriority, setWithPriority] = useState(false);
+  const [withPriority, setWithPriority] = useState<boolean>(false);
   const username = useSelector((state: RootState) => state.user.username);
 
   const navigation = useNavigation();
-  const cart = fakeCart;
   const formErrors = useActionData() as FormErrors;
+  const cart = useSelector(getCart);
+  const totalCartPrice = useSelector(getTotalCartPrice);
+  const priorityPrice = withPriority ? totalCartPrice * 0.2 : 0;
+  const totalPrice = totalCartPrice + priorityPrice;
+
+  if (!cart.length) {
+    return <EmptyCart />;
+  }
 
   const isSubmitting = navigation.state === "submitting";
 
@@ -101,8 +111,8 @@ const CreateOrder = () => {
             type="checkbox"
             name="priority"
             id="priority"
-            // value={withPriority}
-            // onChange={(e) => setWithPriority(e.target.checked)}
+            value={String(withPriority)}
+            onChange={(e) => setWithPriority(e.target.checked)}
             className="h-6 w-6 accent-lime-500 focus:outline-none focus:ring focus:ring-lime-400 focus:ring-offset-2"
           />
           <label htmlFor="priority">Want to yo give your order priority?</label>
@@ -111,7 +121,9 @@ const CreateOrder = () => {
         <div>
           <input type="hidden" name="cart" value={JSON.stringify(cart)} />
           <Button type="primary" disabled={isSubmitting}>
-            {isSubmitting ? "Placing order..." : "Order now"}
+            {isSubmitting
+              ? "Placing order..."
+              : ` Order now for ${formatCurrency(totalPrice)}`}
           </Button>
         </div>
       </Form>
@@ -128,7 +140,7 @@ export const action: ActionFunction = async ({
   const order = {
     ...data,
     cart: JSON.parse(data.cart.toString()),
-    priority: data.priority === "on",
+    priority: data.priority === "true",
   } as IOrder;
   console.log(order);
 
@@ -147,6 +159,9 @@ export const action: ActionFunction = async ({
   const newOrder = await createOrder(order);
 
   console.log(newOrder);
+
+  //**** importing store to clear Cart inside regular function
+  store.dispatch(clearCart());
 
   return redirect(`/order/${newOrder.id}`);
 };

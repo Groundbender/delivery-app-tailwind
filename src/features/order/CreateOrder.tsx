@@ -10,11 +10,14 @@ import {
 import { createOrder } from "../../services/apiRestaurant";
 import { ICart, IOrder } from "../../types";
 import Button from "../../ui/Button";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState, store } from "../../store";
 import { clearCart, getCart, getTotalCartPrice } from "../cart/cartSlice";
 import EmptyCart from "../cart/EmptyCart";
 import { formatCurrency } from "../../utils/helpers";
+import { fetchAddress } from "../user/userSlice";
+import { AnyAction } from "@reduxjs/toolkit";
+import { useAppDispatch } from "../../hooks/redux-hooks";
 
 // https://uibakery.io/regex-library/phone-number
 const isValidPhone = (str: string) =>
@@ -57,6 +60,8 @@ const CreateOrder = () => {
   const formErrors = useActionData() as FormErrors;
   const cart = useSelector(getCart);
   const totalCartPrice = useSelector(getTotalCartPrice);
+  const dispatch = useAppDispatch();
+
   const priorityPrice = withPriority ? totalCartPrice * 0.2 : 0;
   const totalPrice = totalCartPrice + priorityPrice;
 
@@ -65,6 +70,11 @@ const CreateOrder = () => {
   }
 
   const isSubmitting = navigation.state === "submitting";
+
+  const getUserPosition = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    dispatch(fetchAddress());
+  };
 
   return (
     <div className="px-4 py-6">
@@ -94,7 +104,7 @@ const CreateOrder = () => {
           </div>
         </div>
 
-        <div className="mb-5 flex gap-2 flex-col sm:flex-row sm:items-center">
+        <div className="mb-5 flex gap-2 flex-col sm:flex-row sm:items-center relative">
           <label className="sm:basis-40">Address</label>
           <div className="grow">
             <input
@@ -104,6 +114,12 @@ const CreateOrder = () => {
               className="input w-full"
             />
           </div>
+
+          <span className="absolute right-[3px] z-50">
+            <Button type="small" onClick={getUserPosition}>
+              Get address
+            </Button>
+          </span>
         </div>
 
         <div className="my-12 flex gap-5 items-center">

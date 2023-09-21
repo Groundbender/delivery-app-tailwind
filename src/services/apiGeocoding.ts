@@ -1,6 +1,6 @@
-interface ICoords {
-  latitude: string;
-  longitude: string;
+export interface ICoords {
+  latitude: number;
+  longitude: number;
 }
 
 export const getAddress = async ({ latitude, longitude }: ICoords) => {

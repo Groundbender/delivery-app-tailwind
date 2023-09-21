@@ -1,12 +1,15 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
+type FormNoSubmittingBtn = (e: React.MouseEvent<HTMLButtonElement>) => void;
+
+type SimpleBtn = () => void;
 interface ButtonProps {
   children: React.ReactNode;
   disabled?: boolean;
   to?: string;
   type: "primary" | "small" | "secondary" | "round";
-  onClick?: () => void;
+  onClick?: SimpleBtn | FormNoSubmittingBtn;
 }
 
 const Button: React.FC<ButtonProps> = ({

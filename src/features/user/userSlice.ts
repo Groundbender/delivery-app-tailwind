@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { getAddress, ICoords } from "../../services/apiGeocoding";
 
-const getPosition = () => {
+const getPosition = (): Promise<GeolocationPosition> => {
   return new Promise((resolve, reject) => {
     navigator.geolocation.getCurrentPosition(resolve, reject);
   });
@@ -36,7 +36,7 @@ export const fetchAddress = createAsyncThunk<
 type UserSlice = {
   username: string;
   status: "idle" | "loading" | "error";
-  position: {};
+  position: ICoords;
   address: string;
   error: string;
 };
@@ -44,7 +44,7 @@ type UserSlice = {
 const initialState: UserSlice = {
   username: "",
   status: "idle",
-  position: {},
+  position: {} as ICoords,
   address: "",
   error: "",
 };

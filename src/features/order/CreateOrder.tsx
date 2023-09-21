@@ -54,7 +54,15 @@ type FormErrors = {
 };
 const CreateOrder = () => {
   const [withPriority, setWithPriority] = useState<boolean>(false);
-  const username = useSelector((state: RootState) => state.user.username);
+  const {
+    username,
+    status: addressStatus,
+    address,
+    position,
+    error: addressError,
+  } = useSelector((state: RootState) => state.user);
+
+  const isLoadingPosition = addressStatus === "loading";
 
   const navigation = useNavigation();
   const formErrors = useActionData() as FormErrors;
@@ -106,20 +114,32 @@ const CreateOrder = () => {
 
         <div className="mb-5 flex gap-2 flex-col sm:flex-row sm:items-center relative">
           <label className="sm:basis-40">Address</label>
-          <div className="grow">
+          <div className="grow ">
             <input
               type="text"
               name="address"
               required
               className="input w-full"
+              disabled={isLoadingPosition}
+              defaultValue={address}
             />
+            {addressStatus === "error" && (
+              <p className="text-red-700 text-xs mt-2 bg-red-100 p-2 rounded-lg">
+                {addressError}
+              </p>
+            )}
           </div>
-
-          <span className="absolute right-[3px] z-50">
-            <Button type="small" onClick={getUserPosition}>
-              Get address
-            </Button>
-          </span>
+          {!position.latitude && !position.longitude && (
+            <span className="absolute top-[3px] right-[3px] z-50 md:top-[5px] md:right-[5px]">
+              <Button
+                disabled={isLoadingPosition}
+                type="small"
+                onClick={getUserPosition}
+              >
+                Get address
+              </Button>
+            </span>
+          )}
         </div>
 
         <div className="my-12 flex gap-5 items-center">
@@ -136,7 +156,16 @@ const CreateOrder = () => {
 
         <div>
           <input type="hidden" name="cart" value={JSON.stringify(cart)} />
-          <Button type="primary" disabled={isSubmitting}>
+          <input
+            type="hidden"
+            name="position"
+            value={
+              position.longitude && position.latitude
+                ? `${position.latitude}, ${position.longitude}`
+                : ""
+            }
+          />
+          <Button type="primary" disabled={isSubmitting || isLoadingPosition}>
             {isSubmitting
               ? "Placing order..."
               : ` Order now for ${formatCurrency(totalPrice)}`}

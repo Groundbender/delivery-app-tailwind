@@ -16,10 +16,8 @@ import { clearCart, getCart, getTotalCartPrice } from "../cart/cartSlice";
 import EmptyCart from "../cart/EmptyCart";
 import { formatCurrency } from "../../utils/helpers";
 import { fetchAddress } from "../user/userSlice";
-import { AnyAction } from "@reduxjs/toolkit";
 import { useAppDispatch } from "../../hooks/redux-hooks";
 
-// https://uibakery.io/regex-library/phone-number
 const isValidPhone = (str: string) =>
   /^\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/.test(
     str
